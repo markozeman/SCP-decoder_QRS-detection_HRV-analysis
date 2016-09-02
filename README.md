@@ -165,3 +165,7 @@
     *   Array of all bytes in record. 
     * @param  sectionBytesRemaining			
     *   Length of the section without the header. 
+    
+### <span style="color:blue"> function </span> save\_plot_data ()
+
+    * Prepares data for plotting in ECG Viewer and save it to global object plot_data.
