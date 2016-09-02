@@ -4,7 +4,6 @@
  * 
  * */
  
- 
 /** GLOBAL variables */
 
 var curr_byte = -1;
@@ -72,6 +71,10 @@ var section_10_data = {};
 
 // Section 11
 var section_11_data = {};
+
+
+// Data for plotting
+var plot_data = {};
 
 /** GLOBAL variables */
 
@@ -300,12 +303,57 @@ function read_data (filename) {
         decompressReferenceBeatData();
         decompressRhythmData();
         
+        // save data to global object plot_data
+        save_plot_data ();
+        
         // show ECG info
         log_the_results();
       }
     };
     
     oReq.send(null);
+}
+
+
+
+function save_plot_data () {
+    var start_numbers = ECG_Lead_Definition.numbersOfSamples;
+    var numbersOfSamples = new Array(12);
+    
+    var sequential_lead_names = ["I", "II", "III", "aVR", "aVL", "aVF", "V1", "V2", "V3", "V4", "V5", "V6"];
+    var lead_names = ECG_Lead_Definition.leadNames;
+    
+    var rhythm_data = new Array(12);
+    for (var i=0; i<lead_names.length; i++) {
+        for (var j=0; j<sequential_lead_names.length; j++) {
+            if (lead_names[i] == sequential_lead_names[j]) {
+                rhythm_data[j] = decompressedRhythmData[i];
+                numbersOfSamples[j] = start_numbers[i];
+                break;
+            }
+        }
+    }
+    
+    var patient_data = {
+        LastName: patient_and_ecg_data.LastName,
+        Sex: patient_and_ecg_data.Sex,
+        Race: patient_and_ecg_data.Race,
+        DateOfBirth: patient_and_ecg_data.DateOfBirth,
+        DateOfAcquisition: patient_and_ecg_data.DateOfAcquisition,
+        PatientIdentificationNumber: patient_and_ecg_data.PatientIdentificationNumber
+    };
+    
+    var ecg_data = {
+        leadsAllSimultaneouslyRecorded: ECG_Lead_Definition.leadsAllSimultaneouslyRecorded,
+        numbersOfSamples: numbersOfSamples,
+        sampleTimeInterval: encoded_rhythm_data.sampleTimeInterval
+    };
+    
+    plot_data = {
+        ECG_data: ecg_data,
+        Patient_data: patient_data,
+        Rhythm_data: rhythm_data
+    };
 }
 
 
@@ -360,6 +408,9 @@ function log_the_results () {
     console.log(sections_version_number);
     console.log(sections_protocol_number);
     //console.log(sections_reserved);
+    
+    console.log("Plot Data");
+    console.log(plot_data);
 }
 
 
